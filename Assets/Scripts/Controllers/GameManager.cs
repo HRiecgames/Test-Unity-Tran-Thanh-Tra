@@ -113,7 +113,12 @@ public class GameManager : Singleton<GameManager>
     {
         StartCoroutine(WaitBoardController());
     }
-    
+
+    public void RestartGame()
+    {
+        m_boardController.Restart();
+        m_levelCondition.Restart();
+    }
     // Logic for getting item's sprite base on its type
     public Sprite GetItemSprite(Item item)
     {

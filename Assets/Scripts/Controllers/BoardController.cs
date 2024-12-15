@@ -136,6 +136,11 @@ public class BoardController : MonoBehaviour
         m_isDragging = false;
         m_hitCollider = null;
     }
+    
+    public void Restart()
+    {
+        m_board.Fill(true);
+    }
 
     private void FindMatchesAndCollapse(Cell cell1, Cell cell2)
     {

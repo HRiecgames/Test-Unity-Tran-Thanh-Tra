@@ -28,6 +28,8 @@ public class LevelCondition : MonoBehaviour
     }
 
     protected virtual void UpdateText() { }
+    
+    public virtual void Restart(){ }
 
     protected void OnConditionComplete()
     {

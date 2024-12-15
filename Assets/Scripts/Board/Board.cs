@@ -24,6 +24,8 @@ public class Board
     private Transform m_root;
 
     private int m_matchMin;
+    
+    private NormalItem[,] initialItems;
 
     public Board(Transform transform, GameSettings gameSettings)
     {
@@ -35,6 +37,8 @@ public class Board
         this.boardSizeY = gameSettings.BoardSizeY;
 
         m_cells = new Cell[boardSizeX, boardSizeY];
+
+        initialItems = new NormalItem[boardSizeX, boardSizeY];
 
         CreateBoard();
     }
@@ -72,40 +76,56 @@ public class Board
 
     }
 
-    internal void Fill()
+    internal void Fill(bool restart = false)
     {
         for (int x = 0; x < boardSizeX; x++)
         {
             for (int y = 0; y < boardSizeY; y++)
             {
                 Cell cell = m_cells[x, y];
-                NormalItem item = new NormalItem();
-
-                List<NormalItem.eNormalType> types = new List<NormalItem.eNormalType>();
-                if (cell.NeighbourBottom != null)
+                NormalItem item;
+                if (restart)
                 {
-                    NormalItem nitem = cell.NeighbourBottom.Item as NormalItem;
-                    if (nitem != null)
+                    item = initialItems[x, y];
+                    cell.Item.View.gameObject.SetActive(false);
+                    cell.Free();
+                }
+                else
+                {
+                    item = new NormalItem();
+
+                    List<NormalItem.eNormalType> types = new List<NormalItem.eNormalType>();
+                    if (cell.NeighbourBottom != null)
                     {
-                        types.Add(nitem.ItemType);
+                        NormalItem nitem = cell.NeighbourBottom.Item as NormalItem;
+                        if (nitem != null)
+                        {
+                            types.Add(nitem.ItemType);
+                        }
                     }
+
+                    if (cell.NeighbourLeft != null)
+                    {
+                        NormalItem nitem = cell.NeighbourLeft.Item as NormalItem;
+                        if (nitem != null)
+                        {
+                            types.Add(nitem.ItemType);
+                        }
+                    }
+
+                    item.SetType(Utils.GetRandomNormalTypeExcept(types.ToArray()));
                 }
 
-                if (cell.NeighbourLeft != null)
-                {
-                    NormalItem nitem = cell.NeighbourLeft.Item as NormalItem;
-                    if (nitem != null)
-                    {
-                        types.Add(nitem.ItemType);
-                    }
-                }
-
-                item.SetType(Utils.GetRandomNormalTypeExcept(types.ToArray()));
                 item.SetView();
                 item.SetViewRoot(m_root);
 
                 cell.Assign(item);
                 cell.ApplyItemPosition(false);
+                
+                NormalItem initItem = new NormalItem();
+                initItem.SetType(item.ItemType);
+                
+                initialItems[x, y] = initItem;
             }
         }
     }
@@ -674,4 +694,6 @@ public class Board
             }
         }
     }
+    
+    public void Restart() => Fill(true);
 }
