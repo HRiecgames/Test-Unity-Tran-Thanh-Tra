@@ -44,7 +44,7 @@ public class GameManager : Singleton<GameManager>
     // ItemViewPrefab for instantiating view item and avoiding loading from resourse for all items
     public GameObject ItemViewPrefab => m_itemAssets.itemViewPrefab;
     
-    private BoardController m_boardController;
+    public BoardController m_boardController { get; private set; }
 
     private UIMainManager m_uiMenu;
 

@@ -59,4 +59,10 @@ public class NormalItem : Item
 
         return it != null && it.ItemType == this.ItemType;
     }
+    
+    internal override void ExplodeView()
+    {
+        GameManager.Instance.m_boardController.m_board.UpdateItemCount(ItemType, -1);
+        base.ExplodeView();
+    }
 }

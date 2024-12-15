@@ -26,6 +26,8 @@ public class Board
     private int m_matchMin;
     
     private NormalItem[,] initialItems;
+    private int[] itemsCount;
+    private NormalItem.eNormalType minItem;
 
     public Board(Transform transform, GameSettings gameSettings)
     {
@@ -39,7 +41,6 @@ public class Board
         m_cells = new Cell[boardSizeX, boardSizeY];
 
         initialItems = new NormalItem[boardSizeX, boardSizeY];
-
         CreateBoard();
     }
 
@@ -78,6 +79,8 @@ public class Board
 
     internal void Fill(bool restart = false)
     {
+        var normalTypesCount = Enum.GetValues(typeof(NormalItem.eNormalType)).Length;
+        itemsCount = new int[normalTypesCount];
         for (int x = 0; x < boardSizeX; x++)
         {
             for (int y = 0; y < boardSizeY; y++)
@@ -89,6 +92,7 @@ public class Board
                     item = initialItems[x, y];
                     cell.Item.View.gameObject.SetActive(false);
                     cell.Free();
+                    UpdateItemCount(item.ItemType, 1);
                 }
                 else
                 {
@@ -114,6 +118,7 @@ public class Board
                     }
 
                     item.SetType(Utils.GetRandomNormalTypeExcept(types.ToArray()));
+                    UpdateItemCount(item.ItemType, 1);
                 }
 
                 item.SetView();
@@ -167,7 +172,48 @@ public class Board
 
                 NormalItem item = new NormalItem();
 
-                item.SetType(Utils.GetRandomNormalType());
+                List<NormalItem.eNormalType> types = new List<NormalItem.eNormalType>();
+                if (cell.NeighbourBottom != null)
+                {
+                    NormalItem nitem = cell.NeighbourBottom.Item as NormalItem;
+                    if (nitem != null)
+                    {
+                        types.Add(nitem.ItemType);
+                    }
+                }
+                if (cell.NeighbourLeft != null)
+                {
+                    NormalItem nitem = cell.NeighbourLeft.Item as NormalItem;
+                    if (nitem != null)
+                    {
+                        types.Add(nitem.ItemType);
+                    }
+                }
+                if (cell.NeighbourRight != null)
+                {
+                    NormalItem nitem = cell.NeighbourRight.Item as NormalItem;
+                    if (nitem != null)
+                    {
+                        types.Add(nitem.ItemType);
+                    }
+                }
+                if (cell.NeighbourUp != null)
+                {
+                    NormalItem nitem = cell.NeighbourUp.Item as NormalItem;
+                    if (nitem != null)
+                    {
+                        types.Add(nitem.ItemType);
+                    }
+                }
+                List<NormalItem.eNormalType> list = Enum.GetValues(typeof(NormalItem.eNormalType)).Cast<NormalItem.eNormalType>().Except(types).ToList();
+
+                var minType = list[0];
+                foreach (var type in list)
+                {
+                    if (itemsCount[(int)type] < itemsCount[(int)minType]) minType = type;
+                }
+                item.SetType(minType);
+                UpdateItemCount(item.ItemType, 1);
                 item.SetView();
                 item.SetViewRoot(m_root);
 
@@ -696,4 +742,9 @@ public class Board
     }
     
     public void Restart() => Fill(true);
+
+    public void UpdateItemCount(NormalItem.eNormalType type, int change)
+    {
+        itemsCount[(int)type] += change;
+    }
 }

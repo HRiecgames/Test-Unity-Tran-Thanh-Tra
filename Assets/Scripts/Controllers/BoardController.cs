@@ -11,7 +11,7 @@ public class BoardController : MonoBehaviour
 
     public bool IsBusy { get; private set; }
 
-    private Board m_board;
+    public Board m_board { get; private set; }
 
     private GameManager m_gameManager;
 
