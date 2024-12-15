@@ -29,5 +29,19 @@ public class MainToolMenu
         EditorUtility.FocusProjectWindow();
         Selection.activeObject = asset;
     }
+    
+        
+    [MenuItem(menuTitle + "Create item asset data", false, 600)]
+    static void CreateItemAssetsData()
+    {
+        ItemAssets asset = ScriptableObject.CreateInstance<ItemAssets>();
+
+        AssetDatabase.CreateAsset(asset, "Assets/Resources/itemassets.asset");
+        AssetDatabase.SaveAssets();
+
+        EditorUtility.FocusProjectWindow();
+
+        Selection.activeObject = asset;
+    }
 
 }

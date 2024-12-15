@@ -14,16 +14,19 @@ public class Item
 
     public virtual void SetView()
     {
-        string prefabname = GetPrefabName();
-
-        if (!string.IsNullOrEmpty(prefabname))
+        //only create view if its not already created because its never destroyed
+        if (View == null)
         {
-            GameObject prefab = Resources.Load<GameObject>(prefabname);
+            // insstantiate using prefab provided by game manager
+            GameObject prefab = GameManager.Instance.ItemViewPrefab;
             if (prefab)
             {
                 View = GameObject.Instantiate(prefab).transform;
             }
         }
+        // set sprite every time item resets becuase View is not destroyed but rather change the appearance
+        View.gameObject.GetComponent<SpriteRenderer>().sprite = GameManager.Instance.GetItemSprite(this);
+        View.gameObject.SetActive(true);
     }
 
     protected virtual string GetPrefabName() { return string.Empty; }
@@ -101,8 +104,8 @@ public class Item
             View.DOScale(0.1f, 0.1f).OnComplete(
                 () =>
                 {
-                    GameObject.Destroy(View.gameObject);
-                    View = null;
+                    // only set View as inactive to avoid garbage
+                    View.gameObject.SetActive(false);
                 }
                 );
         }

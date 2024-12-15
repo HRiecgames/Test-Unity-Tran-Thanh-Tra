@@ -4,7 +4,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameManager : MonoBehaviour
+
+// Apply Singleton pattern to GameManager for easier access and make sure only one gamemager exists at a time. 
+public class GameManager : Singleton<GameManager>
 {
     public event Action<eStateGame> StateChangedAction = delegate { };
 
@@ -37,20 +39,25 @@ public class GameManager : MonoBehaviour
 
 
     private GameSettings m_gameSettings;
-
-
+    
+    public ItemAssets m_itemAssets { get; private set; }
+    // ItemViewPrefab for instantiating view item and avoiding loading from resourse for all items
+    public GameObject ItemViewPrefab => m_itemAssets.itemViewPrefab;
+    
     private BoardController m_boardController;
 
     private UIMainManager m_uiMenu;
 
     private LevelCondition m_levelCondition;
 
-    private void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         State = eStateGame.SETUP;
 
         m_gameSettings = Resources.Load<GameSettings>(Constants.GAME_SETTINGS_PATH);
-
+        
+        m_itemAssets = Resources.Load<ItemAssets>(Constants.ITEM_ASSETS_PATH);
         m_uiMenu = FindObjectOfType<UIMainManager>();
         m_uiMenu.Setup(this);
     }
@@ -105,6 +112,17 @@ public class GameManager : MonoBehaviour
     public void GameOver()
     {
         StartCoroutine(WaitBoardController());
+    }
+    
+    // Logic for getting item's sprite base on its type
+    public Sprite GetItemSprite(Item item)
+    {
+        if (item is NormalItem)
+            return m_itemAssets.items[(int)((NormalItem)item).ItemType];
+        if ( item is BonusItem)
+            return m_itemAssets.bonusItems[(int)((BonusItem)item).ItemType];
+        else
+            return null;
     }
 
     internal void ClearLevel()

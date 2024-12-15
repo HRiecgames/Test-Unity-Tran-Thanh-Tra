@@ -7,10 +7,10 @@ public class BonusItem : Item
 {
     public enum eBonusType
     {
-        NONE,
         HORIZONTAL,
         VERTICAL,
-        ALL
+        ALL,
+        NONE,
     }
 
     public eBonusType ItemType;
